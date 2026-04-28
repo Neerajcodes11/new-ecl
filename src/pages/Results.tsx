@@ -146,9 +146,18 @@ function ModelCard({
             </div>
           )}
 
+          {result.aiSuggestions && result.aiSuggestions.length > 0 && (
+            <div className={styles.suggestions}>
+              <h4 className={styles.subHead}><Zap size={15} color="var(--brown)" /> AI-Powered Suggestions ✨</h4>
+              <ul className={styles.suggList}>
+                {result.aiSuggestions.map((s, i) => <li key={`ai-${i}`}>{s}</li>)}
+              </ul>
+            </div>
+          )}
+
           {result.suggestions.length > 0 && (
             <div className={styles.suggestions}>
-              <h4 className={styles.subHead}><Zap size={15} color="var(--brown)" /> Suggestions</h4>
+              <h4 className={styles.subHead}><Zap size={15} color="var(--brown)" /> {result.aiSuggestions ? 'More Tips' : 'Suggestions'}</h4>
               <ul className={styles.suggList}>
                 {result.suggestions.map((s, i) => <li key={i}>{s}</li>)}
               </ul>

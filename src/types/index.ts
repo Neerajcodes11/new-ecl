@@ -29,6 +29,7 @@ export interface AnalysisResult {
   riskLevel: 'Low' | 'Medium' | 'High';
   skillGap: string[];
   suggestions: string[];
+  aiSuggestions?: string[];
   profitEstimate: ProfitEstimate;
   breakEven: string;
 }

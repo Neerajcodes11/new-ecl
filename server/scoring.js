@@ -1,10 +1,7 @@
-import { createRequire } from 'module';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-import { readFileSync } from 'fs';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const models = JSON.parse(readFileSync(join(__dirname, 'models.json'), 'utf-8'));
+/**
+ * Scoring engine for e-commerce model recommendations.
+ * Models data is injected via the analyze() function — no duplicate file reads.
+ */
 
 function calculateScore(model, userInput) {
   const { budget, time, skills, risk, revenue } = userInput;
@@ -14,30 +11,41 @@ function calculateScore(model, userInput) {
   score += (s.budget[budget] || 0);
   score += (s.time[time] || 0);
 
+  // Skill scoring: blend of best skill match + average across selected skills
   const skillScores = skills.map(skill => s.skills[skill] || 0);
   const topSkillScore = skillScores.length > 0 ? Math.max(...skillScores) : 0;
   const avgSkillScore = skillScores.length > 0
     ? skillScores.reduce((a, b) => a + b, 0) / skillScores.length
     : 0;
-  score += Math.round((topSkillScore + avgSkillScore) / 2);
+  const actualSkillScore = Math.round((topSkillScore + avgSkillScore) / 2);
+  score += actualSkillScore;
 
   score += (s.risk[risk] || 0);
   score += (s.revenue[revenue] || 0);
 
+  // maxPossible must mirror the SAME skill formula used above.
+  // Best case: user picks the single highest-scoring skill → top = max, avg = max → blend = max.
+  const maxSkillValue = Math.max(...Object.values(s.skills));
   const maxPossible =
     Math.max(...Object.values(s.budget)) +
     Math.max(...Object.values(s.time)) +
-    Math.max(...Object.values(s.skills)) +
+    maxSkillValue +  // mirrors the best-case blend: (max + max) / 2 = max
     Math.max(...Object.values(s.risk)) +
     Math.max(...Object.values(s.revenue));
 
-  const successScore = Math.min(100, Math.round((score / maxPossible) * 100));
+  // Cap at 95% — a perfect 100% implies guaranteed success, which is misleading
+  const rawPercent = Math.round((score / maxPossible) * 100);
+  const successScore = Math.min(95, Math.max(0, rawPercent));
   return successScore;
 }
 
-function getRiskLevel(successScore, budget, risk) {
+function getRiskLevel(successScore, risk) {
+  // High score + user wants low risk → genuinely low risk
   if (successScore >= 70 && risk === 'low') return 'Low';
-  if (successScore >= 50 || risk === 'medium') return 'Medium';
+  // Decent score with any risk preference → medium
+  if (successScore >= 50 && (risk === 'low' || risk === 'medium')) return 'Medium';
+  // Low score overrides user's preference — it's objectively risky
+  if (successScore >= 50 && risk === 'high') return 'Medium';
   return 'High';
 }
 
@@ -46,7 +54,7 @@ function getSkillGap(model, userSkills) {
   return required.filter(s => !userSkills.includes(s));
 }
 
-function getSuggestions(model, skillGap, budget, time) {
+function getBaseSuggestions(model, skillGap, budget, time) {
   const tips = [];
 
   if (skillGap.includes('marketing')) {
@@ -75,12 +83,18 @@ function getSuggestions(model, skillGap, budget, time) {
   return tips.slice(0, 4);
 }
 
-export function analyze(userInput) {
+/**
+ * Main analysis function.
+ * @param {Object} userInput - { budget, time, skills, risk, revenue }
+ * @param {Array} models - The models data array (passed in, not re-read from disk)
+ * @returns {Object} - { recommended, alternatives, all }
+ */
+export function analyze(userInput, models) {
   const results = models.map(model => {
     const successScore = calculateScore(model, userInput);
-    const riskLevel = getRiskLevel(successScore, userInput.budget, userInput.risk);
+    const riskLevel = getRiskLevel(successScore, userInput.risk);
     const skillGap = getSkillGap(model, userInput.skills);
-    const suggestions = getSuggestions(model, skillGap, userInput.budget, userInput.time);
+    const suggestions = getBaseSuggestions(model, skillGap, userInput.budget, userInput.time);
 
     return {
       model: {
