@@ -1,0 +1,219 @@
+.page {
+  min-height: 100vh;
+  background: var(--bg);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 32px 16px 64px;
+}
+
+.container {
+  width: 100%;
+  max-width: 640px;
+}
+
+.backBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: white;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 28px;
+  transition: color 0.15s, border-color 0.15s;
+}
+.backBtn:hover {
+  color: var(--text-primary);
+  border-color: var(--brown-200);
+}
+
+.progressSection {
+  margin-bottom: 28px;
+}
+.progressLabel {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+.progressBar {
+  height: 6px;
+  background: var(--brown-200);
+  border-radius: 100px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.progressFill {
+  height: 100%;
+  background: var(--brown);
+  border-radius: 100px;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.stepDots {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: white;
+  border: 1.5px solid var(--border);
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.dotActive {
+  background: var(--brown);
+  border-color: var(--brown);
+  color: white;
+}
+.dotDone {
+  background: var(--brown-100);
+  border-color: var(--brown);
+  color: var(--brown);
+}
+
+.card {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+}
+
+.questionHeader {
+  margin-bottom: 32px;
+}
+.question {
+  font-size: clamp(20px, 3.5vw, 26px);
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+.hint {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.options {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+.twoCol { grid-template-columns: 1fr 1fr; }
+.threeCol { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+
+.option {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 18px;
+  text-align: left;
+  transition: all 0.2s;
+}
+.option:hover {
+  border-color: var(--brown-200);
+  background: var(--brown-100);
+}
+.optionSelected {
+  background: var(--brown-100) !important;
+  border-color: var(--brown) !important;
+}
+.optionEmoji {
+  font-size: 22px;
+  margin-bottom: 6px;
+}
+.optionLabel {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.optionSub {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.checkIcon {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  color: var(--brown);
+}
+
+.skipNote {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+  padding: 10px 14px;
+  background: var(--pink-light);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--pink-dark);
+}
+
+.errorMsg {
+  font-size: 13px;
+  color: var(--error);
+  background: #FEF2F2;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  border: 1px solid #FCA5A5;
+}
+
+.nextBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--brown);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background 0.2s, transform 0.15s;
+}
+.nextBtn:hover:not(:disabled) {
+  background: var(--brown-dark);
+  transform: translateY(-1px);
+}
+.nextBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2.5px solid rgba(255,255,255,0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 500px) {
+  .card { padding: 24px; }
+  .twoCol { grid-template-columns: 1fr; }
+  .threeCol { grid-template-columns: 1fr 1fr; }
+}
